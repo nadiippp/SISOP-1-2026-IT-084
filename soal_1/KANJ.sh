@@ -1,36 +1,61 @@
-#!/bin/bash
+BEGIN {
+    FS=","
+    mode = ARGV[2]
+    ARGC-- 
+}
 
-mode=$2
+NR > 1 {
 
-if [ "$mode" == "a" ]; then
-    banyakPenumpang=$(awk -F ',' 'NR>1 {count++} END {print count}' "$1")
-    echo "Jumlah seluruh penumpang KANJ adalah $banyakPenumpang orang"
-
-elif [ "$mode" == "b" ]; then
-    banyakGerbong=$(awk -F ',' 'NR>1 {gerbong[$4]=1} END {print length(gerbong)}' "$1")
-    echo "Jumlah gerbong penumpang KANJ adalah $banyakGerbong"
-
-elif [ "$mode" == "c" ]; then
-    namaPenumpangTertua=$(awk -F ',' 'NR>1 {if($2 > max){max=$2; nama=$1}} END {print nama}' "$1")
-    umurPenumpangTertua=$(awk -F ',' 'NR>1 {if($2 > max){max=$2}} END {print max}' "$1")
-    echo "$namaPenumpangTertua adalah penumpang kereta tertua dengan usia $umurPenumpangTertua tahun"
-
-elif [ "$mode" == "d" ]; then
-    rataUsia=$(awk -F ',' '
-    NR>1 {
-        total += $2
+    # jumlah penumpang
+    if (mode == "a") {
         count++
     }
-    END {
-        if (count > 0)
-            print total/count
-    }' "$1")
-    echo "Rata-Rata usia penumpang adalah $rataUsia tahun"
 
-elif [ "$mode" == "e" ]; then
-    jumlahBusiness=$(awk -F ',' 'NR>1 && $3=="Business" {count++} END {print count}' "$1")
-    echo "Jumlah penumpang business class ada $jumlahBusiness orang"
+    # jumlah gerbong
+    else if (mode == "b") {
+        gerbong[$4] = 1
+    }
 
-else
-    echo "Soal tidak dikenali. Gunakan a, b, c, d, atau e."
-fi
+    # penumpang tertua
+    else if (mode == "c") {
+        if ($2 > max) {
+            max = $2
+            nama = $1
+        }
+    }
+
+    # rata-rata usia
+    else if (mode == "d") {
+        total += $2
+        jumlah++
+    }
+
+    # business class
+    else if (mode == "e") {
+        if ($3 == "Business") {
+            business++
+        }
+    }
+}
+
+END {
+    if (mode == "a") {
+        print "Jumlah seluruh penumpang KANJ adalah " count " orang"
+    }
+    else if (mode == "b") {
+        print "Jumlah gerbong penumpang KANJ adalah " length(gerbong)
+    }
+    else if (mode == "c") {
+        print nama " adalah penumpang kereta tertua dengan usia " max " tahun"
+    }
+    else if (mode == "d") {
+        if (jumlah > 0)
+            print "Rata-Rata usia penumpang adalah " (total/jumlah) " tahun"
+    }
+    else if (mode == "e") {
+        print "Jumlah penumpang business class ada " business " orang"
+    }
+    else {
+        print "Soal tidak dikenali. Gunakan a, b, c, d, atau e."
+    }
+}
