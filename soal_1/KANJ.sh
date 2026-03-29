@@ -50,7 +50,7 @@ END {
     }
     else if (mode == "d") {
         if (jumlah > 0)
-            print "Rata-Rata usia penumpang adalah " (total/jumlah) " tahun"
+            print "Rata-Rata usia penumpang adalah " int(total/jumlah) " tahun"
     }
     else if (mode == "e") {
         print "Jumlah penumpang business class ada " business " orang"
